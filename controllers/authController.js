@@ -48,3 +48,29 @@ export const getAllUsers = async (req,res) => {
     return res.status(500).json({message:"Internal Server error!"});
     }
 };
+
+export const updateUser = async (req,res) => {
+    try {
+    const {id} = req.params;  
+    const {firstName,lastName,email} = req.body;
+    
+    const isEmailExist = await User.findOne({email,_id:{ $ne:id }});// not equal
+    if(isEmailExist){
+        return res.status(400).json({message:"Email already Exists"})
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id,{
+        firstName,
+        lastName,
+        email,
+    },{new:true}).select("-password"); // (Optional) only if you want to exclude the password in response
+
+    await updatedUser.save();
+    
+    res.status(200).json({message:"User updated successfully!",data:updatedUser});
+
+    } catch (error) {
+    console.log(`Error in updating user : ${error.message}`);
+    return res.status(500).json({message:"Internal Server error!"});    
+    }
+};
