@@ -1,5 +1,7 @@
 import { User } from "../models/userModel.js";
 
+import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+
 import bcrypt from "bcryptjs";
 
 export const registerAccount = async (req,res) => {
@@ -89,7 +91,8 @@ export const login = async (req,res) => {
     if(!isPasswordMatch){
         return res.status(400).json({message:"Username or password is incorrect!"});
     }
-    res.status(200).json({message:"Login successfully!",user});      
+    const token = generateTokenAndSetCookie(res,user)
+    res.status(200).json({message:"Login successfully!",data:user,token});      
     } catch (error) {
     console.log(`Error in login : ${error.message}`);
     return res.status(500).json({message:"Internal Server error!"});           
